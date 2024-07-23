@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: actions-runner-contoller
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  project: default
+  source:
+    repoURL: https://aws.github.io/eks-charts
+    targetRevision: 1.7.1
+    helm:
+      values: |-
+        clusterName: <CLUSTER_NAME>
+        serviceAccount:
+          annotations:
+            eks.amazonaws.com/role-arn: arn:aws:iam::<AWS_ACCOUNT_ID>:role/<CLUSTER_NAME>CloudAwsLoadBalancerControllerRole
+          create: true
+          name: aws-load-balancer-controller
+        region: <AWS_REGION>
+        defaultTags:
+          VantaNonProd: "false"
+          VantaDescription: "Load Balancer Resources for hosting the website"
+          VantaOwner: "engineering@simplyagree.com"
+
+    chart: aws-load-balancer-controller
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ApplyOutOfSyncOnly=true
+      - Replace=true
+      - PruneLast=true
