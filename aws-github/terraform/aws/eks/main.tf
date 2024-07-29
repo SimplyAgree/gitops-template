@@ -582,15 +582,7 @@ data "aws_iam_policy_document" "crossplane_custom_trust_policy" {
       identifiers = [module.eks.oidc_provider_arn]
     }
   }
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::<AWS_ACCOUNT_ID>:role/KubernetesAdmin"]
-    }
-  }
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
