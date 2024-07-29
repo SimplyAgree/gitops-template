@@ -1,3 +1,0 @@
-accounts = {
-  "Paul Hastings" : "Customers"
-}

@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: aws-loadbalancer-controller-components
+  name: rancher-components
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: '5'
@@ -9,11 +9,11 @@ spec:
   project: default
   source:
     repoURL: <GITOPS_REPO_URL>
-    path: registry/clusters/<CLUSTER_NAME>/components/aws-loadbalancer-controller
+    path: registry/clusters/<CLUSTER_NAME>/components/rancher
     targetRevision: HEAD
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: cattle-system
   syncPolicy:
     automated:
       prune: true

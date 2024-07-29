@@ -23,7 +23,6 @@ spec:
           VantaNonProd: "false"
           VantaDescription: "Load Balancer Resources for hosting the website"
           VantaOwner: "engineering@simplyagree.com"
-
     chart: aws-load-balancer-controller
   destination:
     server: https://kubernetes.default.svc
