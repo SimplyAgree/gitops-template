@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "<KUBEFIRST_STATE_STORE_BUCKET>"
+    bucket = "k1-state-store-devops-kaztp4"
     key    = "terraform/aws/terraform.tfstate"
 
     region  = "<CLOUD_REGION>"
