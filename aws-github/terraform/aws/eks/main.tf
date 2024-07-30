@@ -20,12 +20,6 @@ data "aws_iam_roles" "AWSAdministratorAccess" {
   name_regex = ".*AWSReservedSSO_AWSAdministratorAccess.*"
 }
 
-# This data lookup lets us use the AWS Audit role, even if its in another region.
-data "aws_iam_role" "latacora_aws_auditor" {
-  depends_on = [module.latacora_aws_auditor]
-  name       = "LatacoraAWSAuditRole"
-}
-
 locals {
   name            = "<CLUSTER_NAME>"
   cluster_version = "1.30"
@@ -45,12 +39,6 @@ locals {
   latacora_account_id = "874849186793"
   permission_boundary_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/TerraformRolePermissionsBoundary"
 
-}
-
-module "latacora_aws_auditor" {
-  source               = "./modules/latacora-aws-auditor"
-  count                = 1
-  audit_aws_account_id = local.latacora_account_id
 }
 
 ################################################################################
@@ -121,26 +109,7 @@ module "eks" {
         }
       }
     }
-  },
-    {
-      "latacora-audit-role" = {
-        principal_arn     = module.latacora_aws_auditor.latacora_audit_role_arn
-        user_name         = "latacora-audit-role"
-        kubernetes_groups = ["edit", "latacora-audit-read-binding"]
-        type              = "STANDARD"
-
-        policy_associations = {
-          admin = {
-            policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSEditPolicy"
-            access_scope = {
-              type = "cluster"
-            }
-          }
-        }
-      }
-    }
-  )
-
+  })
 
   eks_managed_node_group_defaults = {
     ami_type       = "AL2_x86_64"
@@ -157,8 +126,8 @@ module "eks" {
   eks_managed_node_groups = {
     # Default node group - as provided by AWS EKS
     default_node_group = {
-      desired_size = 4
-      min_size     = 3
+      desired_size = 5
+      min_size     = 4
       max_size     = 12
       # By default, the module creates a launch template to ensure tags are propagated to instances, etc.,
       # so we need to disable it to use the default template provided by the AWS EKS managed node group service
@@ -181,18 +150,21 @@ module "eks" {
 
 resource "kubernetes_storage_class_v1" "encrypted_gp3" {
   metadata {
-    name = "encrypted-gp3"
+    name = "gp3"
+    annotations = {
+      "storageclass.kubernetes.io/is-default-class" : "true"
+    }
   }
   allow_volume_expansion = true
-  storage_provisioner = "kubernetes.io/aws-ebs"
+  reclaim_policy         = "Delete"
+  volume_binding_mode    = "WaitForFirstConsumer"
+  storage_provisioner    = "ebs.csi.aws.com"
   parameters = {
     type = "gp3"
     encrypted = "true"
     fsType = "ext4"
   }
-
 }
-
 
 ################################################################################
 # Supporting Resources

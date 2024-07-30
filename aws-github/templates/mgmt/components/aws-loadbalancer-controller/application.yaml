@@ -21,7 +21,7 @@ spec:
         region: <AWS_REGION>
         defaultTags:
           VantaNonProd: "false"
-          VantaDescription: "Load Balancer Resources for hosting the website"
+          VantaDescription: "Load Balancer Resources for DevOps Applications"
           VantaOwner: "engineering@simplyagree.com"
     chart: aws-load-balancer-controller
   destination:

@@ -320,7 +320,7 @@ module "aws_lb_controller" {
   name      = "aws-load-balancer-controller"
   namespace = "kube-system"
 
-  role_name            = "${title(module.eks.cluster_name)}AwsLoadBalancerController"
+  role_name            = "${module.eks.cluster_name}AwsLoadBalancerController"
   role_name_use_prefix = false
 
   role_description = "IRSA for AWS LoadBalancer Controller"
